@@ -4,5 +4,11 @@
     "java.project.referencedLibraries": [
         "lib/**/*.jar"
     ],
-    "C_Cpp.autocomplete": "disabled"
+    "C_Cpp.autocomplete": "disabled",
+    "launch": {
+        "editor.acceptSuggestionOnEnter": "false",
+        "configurations": [],
+        "compounds": []
+    }
+    
 }
