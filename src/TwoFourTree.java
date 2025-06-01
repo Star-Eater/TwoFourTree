@@ -90,7 +90,7 @@ public class TwoFourTree {
     }
 
     TwoFourTreeItem root = null; // Root of the tree. If null, the tree is empty.
-
+    
     // Adding a value to the tree
     public boolean addValue(int value) {
 
@@ -138,8 +138,7 @@ public class TwoFourTree {
     		 */
         	
 
-        // Special Case 1:Walker starts at the first and (Only) node ever created for
-        // the tree.
+        // =========Special Case 1:Walker starts at the first and (Only) node ever created for the tree.======================================
         if (walker.isRoot() && walker.isLeaf) {
             // Scenario for a TwoNode
             if (walker.isTwoNode()) {
@@ -155,7 +154,8 @@ public class TwoFourTree {
                     walker.value2 = value;
                     ++walker.values;
                 }
-            } else if (walker.isThreeNode()) {
+            } 
+            else if (walker.isThreeNode()) {
                 /*
                  * 4 10
                  * S1. 1 4 10
@@ -173,7 +173,8 @@ public class TwoFourTree {
                     walker.value3 = walker.value2;
                     walker.value2 = value;
                     ++walker.values;
-                } else {
+                } 
+                else {
                     walker.value3 = value;
                     ++walker.values;
                 }
@@ -196,17 +197,179 @@ public class TwoFourTree {
                 Right.parent = RootParent;
 
                 // Root is no longer a leaf
-                walker = RootParent;
+                root = RootParent;
+                walker = root;
                 walker.isLeaf = false;
 
             }
-            return true;
+//            return true;
         }
         
-        // Traversing 
+        // With the goal of inserting. Traversing always should go to the leaf 
         while(walker.isLeaf == false) {
         	
+        	// Two node Insert scenarios
+        	if (walker.isTwoNode()) {
+        		// Either you are greater or your less.
+        		if (value < walker.value1) {
+        			walker = walker.leftChild;
+        		}
+        		else {
+        			walker = walker.rightChild;
+        		}
+        	}
+        	else if (walker.isThreeNode()) {
+        		//Value is either your lesser, in between, or greater 
+        		if (value < walker.value1) {
+        			walker = walker.leftChild;
+        		}
+        		else if (value > walker.value1 && value < walker.value2) {
+        			walker = walker.centerChild;
+        		}
+        		else {
+        			walker = walker.rightChild;
+        		}
+        	}
+        	else if (walker.isFourNode()) {
+        		//Since its at the leaf it has a parent we would promote the middle value to the parent and go on from there.
+        		
+        		// Parent is a two node scenario.
+        		if (walker.parent.isTwoNode()) {
+        			// Either the value is smaller or bigger than the parents two node value
+        			if (walker.value2 < walker.parent.value1) {
+        				walker.parent.value1 = walker.parent.value2;
+        				walker.parent.value1 = walker.value2;
+        				walker.parent.values++;
+        			}
+        			else {
+        				walker.parent.value2 = walker.value2;
+        				walker.parent.values++;
+        			}
+        			/* 
+        			 * The parent is now a three node. It now has a center child place.
+        			 * Break apart the old node values and assign them accordingly.
+        			*/
+        			TwoFourTreeItem temp;
+        			TwoFourTreeItem temp2;
+        			
+        			// If walkers value1 is greater than their parents value1. It means you're on the right hand side of the parent.
+        			if (walker.value1 > walker.parent.value1 ) {
+        				//If the center was not there.
+        				if (walker.parent.centerChild == null) {
+        					temp = new TwoFourTreeItem(walker.value1);
+        					walker.parent.centerChild = temp;
+        					temp2 = new TwoFourTreeItem(walker.value3);
+        					walker.parent.rightChild = temp2;
+        					
+        					//Send walker back somewhere either at the root or parent. I find out later what's more time saving.
+        					walker = root;
+            			}
+        				else {
+        					// We will have to see what we put here in the future
+        				}
+        				
+        			}
+        			// If walkers value1 is lesser than their parents value1. It means you're on the left side of the parent.
+        			else {
+        				if (walker.parent.centerChild == null) {
+        					temp = new TwoFourTreeItem(walker.value3);
+        					walker.parent.centerChild = temp;
+        					temp2 = new TwoFourTreeItem(walker.value1);
+        					walker.parent.leftChild= temp2;
+        					
+        					//Send walker back somewhere either at the root or parent.
+        					walker = root;
+        				}
+        				else {
+        					// blank
+        				}
+        			}
+        		}
+        		// Parent is a two node scenario.
+        		else if (walker.parent.isThreeNode()) {
+        			
+        		}
+        		
+        	}
+        	if (walker.isLeaf) {
+        		if (walker.isTwoNode()) {
+                    // If value is less than nodes value 1. Switch old v1s place to v2 and give to
+                    // v1.
+                    if (value < walker.value1) {
+                        walker.value2 = walker.value1;
+                        walker.value1 = value;
+                        ++walker.values;
+                    }
+                    // Place value in the second spot otherwise.
+                    else {
+                        walker.value2 = value;
+                        ++walker.values;
+                    }
+                }
+        		else if (walker.isThreeNode()) {
+        			if (value < walker.value1) {
+        				walker.value3 = walker.value2;
+        				walker.value2 = walker.value1;
+        				walker.value1 = value;
+        				walker.values++;
+        			}
+        			else if (value > walker.value1 && value < walker.value2) {
+        				walker.value3 = walker.value2;
+        				walker.value2 = value;
+        				walker.values++;
+        			}
+        			else {
+        				walker.value3 = value;
+        				walker.values++;
+        			}
+        		}
+        		else if (walker.isFourNode()) {
+        			TwoFourTreeItem temp;
+        			TwoFourTreeItem temp2;
+        			// Parent Two Node Scenarios
+        			if (walker.parent.isTwoNode()) {
+        				// Determine if walker value1 is less than or more than there parent.
+        				if (walker.value1 > walker.parent.value1) {
+        					//The lesser of the node goes as the center node
+        					//While the greater stays as the right.
+        					walker.parent.value2 = walker.value2;
+        					walker.parent.values++;
+        					temp = new TwoFourTreeItem(walker.value1);
+        					temp2 = new TwoFourTreeItem(walker.value3);
+        					walker.parent.centerChild = temp;
+        					walker.parent.rightChild = temp2;
+        					temp.parent = walker.parent;
+        					temp2.parent = walker.parent;
+        					walker = root;
+        					
+        				}
+        				else {
+        					//The greater of the node goes as the center node
+        					//While the lesser stays as the left
+        					walker.parent.value2 = walker.parent.value1;
+        					walker.parent.value1 = walker.value2;
+        					walker.parent.values++;
+        					temp = new TwoFourTreeItem(walker.value1);
+        					temp2 = new TwoFourTreeItem(walker.value3);
+        					walker.parent.centerChild = temp2;
+        					walker.parent.leftChild = temp;
+        					temp.parent = walker.parent;
+        					temp2.parent = walker.parent;
+        					walker = root;
+        				}
+        				
+        			
+        			//End of two node scenario
+        			}
+        			else if (walker.parent.isThreeNode()) {
+        				
+        			}
+        		}
+        	}
+        	
         }
+        
+        
 
         return false;
     }
@@ -226,6 +389,7 @@ public class TwoFourTree {
         if (root != null)
             root.printInOrder(0);
     }
+   
 
     public TwoFourTree() {
     }
