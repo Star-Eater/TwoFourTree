@@ -194,14 +194,21 @@ public class App {
         tft.addValue(13);
         tft.addValue(17);
         tft.addValue(19);
+//        tft.printInOrder();
         tft.addValue(23);
+        //tft.printInOrder();
         tft.addValue(29);
+        //tft.printInOrder();
         tft.addValue(31);
         tft.addValue(37);
         tft.addValue(41);
+        tft.printInOrder();
+        //tft.printInOrder();
         tft.addValue(43);
+       //tft.printInOrder();
         tft.addValue(47);
         tft.addValue(53);
+        tft.printInOrder();
         tft.addValue(59);
         tft.addValue(67);
         tft.addValue(71);
@@ -213,7 +220,7 @@ public class App {
 
         
         System.out.println("Static test: first few prime numbers:");
-        
+        tft.printInOrder();
         tft.deleteValue(37);
         System.out.println("\nWithout 37:");
         tft.printInOrder();

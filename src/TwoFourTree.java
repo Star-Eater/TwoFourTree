@@ -99,7 +99,7 @@ public class TwoFourTree {
             root = new TwoFourTreeItem(value);
             return true;
         }
-
+        
         /*
          * Search for where the value needs to be added to. We do that with a walker
          * pointer that starts from the root of the tree and goes
@@ -108,6 +108,7 @@ public class TwoFourTree {
          */
 
         TwoFourTreeItem walker = root;
+        
         /* SCENARIOS:
     		 * The node in the tree is the first node created: 
     		 * 					1. (v1,(blank),(blank)) The first value goes in the v1. following we try to sort it out with this node having
@@ -230,7 +231,7 @@ public class TwoFourTree {
         			walker = walker.rightChild;
         		}
         	}
-        	else if (walker.isFourNode()) {
+        	else if (walker.isFourNode() && !walker.isRoot()) {
         		//Since its at the leaf it has a parent we would promote the middle value to the parent and go on from there.
         		
         		// Parent is a two node scenario.
@@ -260,9 +261,28 @@ public class TwoFourTree {
         					walker.parent.centerChild = temp;
         					temp2 = new TwoFourTreeItem(walker.value3);
         					walker.parent.rightChild = temp2;
+        					temp.isLeaf = false;
+        					temp2.isLeaf = false;
+        					//Assign the children to temp and assign walkers old children on each side to new parents.
+        					temp.leftChild = walker.leftChild;
+        					temp.rightChild = walker.centerLeftChild;
+        					temp.parent = walker.parent;
+        					temp2.parent = walker.parent;
         					
-        					//Send walker back somewhere either at the root or parent. I find out later what's more time saving.
-        					walker = root;
+        					walker.leftChild.parent = temp;
+        					walker.centerLeftChild.parent = temp;
+        					
+        					temp2.leftChild = walker.centerRightChild;
+        					temp2.rightChild = walker.rightChild;
+        					
+        					walker.rightChild.parent = temp2;
+        					walker.centerRightChild.parent = temp2;
+        					
+        					
+        					//6/5/2023 1 of the Errors is here somewhere
+        					
+        					// Send walker back to the parent node that got a new value
+        					walker = walker.parent;
             			}
         				else {
         					// We will have to see what we put here in the future
@@ -278,7 +298,8 @@ public class TwoFourTree {
         					walker.parent.leftChild= temp2;
         					
         					//Send walker back somewhere either at the root or parent.
-        					walker = root;
+        					walker = walker.parent;
+        				
         				}
         				else {
         					// blank
@@ -291,6 +312,41 @@ public class TwoFourTree {
         		}
         		
         	}
+        	
+        	//Walker is a Four node but our last logic didn't account for if it had a parent in the loop. Ugly solution.
+        	else if (walker.isFourNode() && walker.isRoot()) {
+        		// There has to be a better way for doing this.
+                TwoFourTreeItem RootParent = new TwoFourTreeItem(walker.value2);
+                TwoFourTreeItem Left = new TwoFourTreeItem(walker.value1);
+                TwoFourTreeItem Right = new TwoFourTreeItem(walker.value3);
+
+                // Attach the new parent to its child
+                RootParent.leftChild = Left;
+                RootParent.rightChild = Right;
+                // Vice versa
+                Left.parent = RootParent;
+                Right.parent = RootParent;
+                Left.leftChild = walker.leftChild;
+                Left.rightChild = walker.centerLeftChild;
+                Right.rightChild = walker.rightChild;
+                Right.leftChild = walker.centerRightChild;
+                walker.leftChild.parent = Left;
+                walker.centerLeftChild.parent = Left;
+                walker.centerRightChild.parent = Right;
+                walker.rightChild.parent = Right;
+                
+
+                // Root is no longer a leaf but also because of the condition set the newly children leaves to false.
+                root = RootParent;
+                walker = root;
+                walker.isLeaf = false;
+                Left.isLeaf = false;
+                Right.isLeaf = false;
+                
+                // Our root node in this logic had children, assign them correctly.
+                
+        	}
+        	
         	if (walker.isLeaf) {
         		if (walker.isTwoNode()) {
                     // If value is less than nodes value 1. Switch old v1s place to v2 and give to
@@ -340,7 +396,7 @@ public class TwoFourTree {
         					walker.parent.rightChild = temp2;
         					temp.parent = walker.parent;
         					temp2.parent = walker.parent;
-        					walker = root;
+        					walker = walker.parent;
         					
         				}
         				else {
@@ -361,12 +417,98 @@ public class TwoFourTree {
         			
         			//End of two node scenario
         			}
+        			//Start of three node scenarios
         			else if (walker.parent.isThreeNode()) {
+        				// Promote walkers value 2.
+        				// If the promotion came from the right child.
+        				if (walker.value2 > walker.parent.value2) {
+        					walker.parent.value3 = walker.value2;
+        					// Break the old node apart
+            				temp = new TwoFourTreeItem(walker.value1);
+            				temp2 = new TwoFourTreeItem(walker.value3);
+            				// Its parent is now a four node. Assign Correctly
+            				temp.parent = walker.parent;
+            				temp2.parent = walker.parent;
+            				// Promotion came from the right. The lesser in the node goes to the center right
+            				// Meanwhile the greater goes stays on the right hand side in a brand new node.
+            				walker.parent.centerRightChild = temp;
+            				walker.parent.rightChild = temp2;
+            				walker.parent.centerLeftChild = walker.parent.centerChild;
+            				// Update the status of the nodes
+            				walker = walker.parent;
+            				walker.values++;
+            				//The center no longer exists
+            				walker.centerChild = null;
+            				
+            				//Send the node where ever it needs to be.
+            				
+            				//Send the node to the left
+            				if (value < walker.value1) {
+            					walker = walker.leftChild;
+            				}
+            				else if (value > walker.value1 && value < walker.value2) {
+            					walker = walker.centerLeftChild;
+            				}
+            				else if (value > walker.value2 && value < walker.value3) {
+            					walker = walker.centerRightChild;
+            				}
+            				else {
+            					walker = walker.rightChild;
+            				}
+            				if (walker.isLeaf) {
+            					if (walker.isTwoNode()) {
+            	                    // If value is less than nodes value 1. Switch old v1s place to v2 and give to
+            	                    // v1.
+            	                    if (value < walker.value1) {
+            	                        walker.value2 = walker.value1;
+            	                        walker.value1 = value;
+            	                        ++walker.values;
+            	                    }
+            	                    // Place value in the second spot otherwise.
+            	                    else {
+            	                        walker.value2 = value;
+            	                        ++walker.values;
+            	                    }
+            	                }
+            				}
+            				
+        				}
+        				// If the promotion came from the middle child.
+        				else if(walker.value2 < walker.parent.value2 && walker.value2 > walker.parent.value1) {
+        					walker.parent.value3 = walker.parent.value2;
+        					walker.parent.value2 = walker.value2;
+        					//
+        					// Break the old node apart
+        					temp = new TwoFourTreeItem(walker.value1);
+            				temp2 = new TwoFourTreeItem(walker.value3);
+            				// Its parent is now a four node. Assign Correctly
+            				temp.parent = walker.parent;
+            				temp2.parent = walker.parent;
+            				// Promotion came from the middle. The lesser in the node goes to center left vice versa
+            				// for the greater in the node.
+            				walker.parent.centerLeftChild = temp;
+            				walker.parent.centerRightChild = temp2;
+            				// Update the status of the nodes
+            				walker = walker.parent;
+            				// The center no longer exists
+            				
+            				
+        				}
+        				// If the promotion came from the left child.
+        				else {
+        					walker.parent.value3 = walker.parent.value2;
+        					walker.parent.value2 = walker.parent.value1;
+        					walker.parent.value1 = walker.value2;
+        				}
+        				
         				
         			}
         		}
         	}
-        	
+//        	// EMERGENCY INSERTION
+//        	if (walker.isLeaf && insertion == 1) {
+//        		
+//        	}
         }
         
         
