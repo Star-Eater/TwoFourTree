@@ -255,8 +255,6 @@ public class TwoFourTree {
         			
         			// If walkers value1 is greater than their parents value1. It means you're on the right hand side of the parent.
         			if (walker.value1 > walker.parent.value1 ) {
-        				//If the center was not there.
-        				if (walker.parent.centerChild == null) {
         					temp = new TwoFourTreeItem(walker.value1);
         					temp2 = new TwoFourTreeItem(walker.value3);
         					
@@ -286,15 +284,10 @@ public class TwoFourTree {
         					
         					// Send walker back to the parent node that got a new value
         					walker = walker.parent;
-            			}
-        				else {
-        					// We will have to see what we put here in the future
-        				}
         				
         			}
         			// If walkers value1 is lesser than their parents value1. It means you're on the left side of the parent.
         			else {
-        			    if (walker.parent.centerChild == null) {
         			        
         			        temp = new TwoFourTreeItem(walker.value3);
         			        temp2 = new TwoFourTreeItem(walker.value1);
@@ -322,11 +315,7 @@ public class TwoFourTree {
 
         			        // Send walker back to the parent node
         			        walker = walker.parent;
-        			    }
-
-        				else {
-        					// blank
-        				}
+        			    
         			}
         		}
         		// Parent is a three node scenario.
