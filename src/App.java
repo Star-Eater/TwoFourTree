@@ -59,6 +59,9 @@ public class App {
                 // System.out.printf("\nFailed to find %d", e.intValue());
 				failures++;
 			}
+			if (sentinel == true) {
+				System.out.printf("%d was found\n", e);
+			}
 		}
 		
 		if(failures > 0) {
@@ -219,18 +222,18 @@ public class App {
         
         System.out.println("Static test: first few prime numbers:");
         tft.printInOrder();
-//        tft.deleteValue(37);
-//        System.out.println("\nWithout 37:");
-//        tft.printInOrder();
-//        tft.deleteValue(73);
-//        System.out.println("\nWithout 73:");
-//        tft.printInOrder();
-//        tft.deleteValue(97);
-//        System.out.println("\nWithout 97:");
-//        tft.printInOrder();
+        tft.deleteValue(37);
+        System.out.println("\nWithout 37:");
+        tft.printInOrder();
+        tft.deleteValue(73);
+        System.out.println("\nWithout 73:");
+        tft.printInOrder();
+        tft.deleteValue(97);
+        System.out.println("\nWithout 97:");
+        tft.printInOrder();
         
 
-//        executeIntCase(100, 20, true);
+//       executeIntCase(100, 20, true);
 //        executeIntCase(1000, 200, true);
 //        executeIntCase(10000, 2000, true);
 //        executeIntCase(100000, 20000, true);
