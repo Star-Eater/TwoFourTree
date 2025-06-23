@@ -276,11 +276,10 @@ public class TwoFourTree {
 				else {
 					this.value2 = value;
 					++this.values;
-				}	
-			}
-			else if (this.isThreeNode()) {
+				}
+			} else if (this.isThreeNode()) {
 				if (value < this.value1) {
-					
+
 				}
 			}
 
@@ -654,7 +653,8 @@ public class TwoFourTree {
 					}
 					// If value 2 of walker is bigger than parents value 1 but smaller than 3.
 					// Promotion came from the middle.
-					else if (walker.value2 > walker.parent.value1 && walker.value2 < walker.parent.value3) {
+					// BUGGED no longer
+					else if (walker.value2 > walker.parent.value1 && walker.value2 < walker.parent.value2) {
 						walker.parent.value3 = walker.parent.value2;
 						walker.parent.value2 = walker.value2;
 						walker.parent.values++;
@@ -1225,8 +1225,14 @@ public class TwoFourTree {
 			} else if (indexPosition == 0 && walker.isThreeNode()) {
 				if (!walker.leftChild.isTwoNode()) {
 					walker = FindMaxNode(walker.leftChild);
+					int MaxValue = walker.findMaxValue();
+					hold.setValueAt(indexPosition, MaxValue);
+					walker.removeValueAt(walker.IndexLocation(MaxValue));
 				} else if (!walker.centerChild.isTwoNode()) {
 					walker = FindMinNode(walker.centerChild);
+					int MinValue = walker.value1;
+					hold.setValueAt(indexPosition, MinValue);
+					walker.removeValueAt(walker.IndexLocation(MinValue));
 				} else {
 					TwoFourTreeItem Merge = Merge(walker.leftChild, walker, walker.centerChild);
 					walker = Merge;
@@ -1663,11 +1669,14 @@ public class TwoFourTree {
 		// Perform the last steps of Left rotation
 		node.parent.setValueAt(parentValueLocation, sibling.value1);
 		sibling.removeLeftmostValue();
-
+		node.values++;
 		// Re-attach children to new statuses
 		if (!node.isLeaf) {
+			if (node.isThreeNode()) {
+				node.centerChild = node.rightChild;
+			}
+
 			node.rightChild = sibling.leftChild;
-			node.values++;
 
 			sibling.leftChild.parent = node;
 

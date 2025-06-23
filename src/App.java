@@ -13,7 +13,7 @@ public class App {
      * Shuffle the created lists. If your code works without this but not with it,
      * something is wrong while "moving left" in a case.
      */
-    static boolean ShouldShuffle = false;
+    static boolean ShouldShuffle = true;
 
     /*
      * Actually randomize the test case. We will use this in testing. When this is
@@ -55,7 +55,7 @@ public class App {
      * is *VERY* noisy, but running it for the small dynamic cases may help you find
      * deletion problems.
      */
-    static boolean PrintDeleteTrees = false;
+    static boolean PrintDeleteTrees = true;
 
     /*
      * END OF CONFIGURATION OPTIONS
@@ -63,7 +63,8 @@ public class App {
 
     // Only gets used if !ShouldBeRandom.
     static Random RandomGenerator = new Random(1);
-
+    
+    
     private static ArrayList<Integer> deDuplicateAndScramble(ArrayList<Integer> list) {
         TreeSet<Integer> deDuped = new TreeSet<Integer>(list);
         ArrayList<Integer> outList = new ArrayList<Integer>(deDuped);
@@ -292,17 +293,62 @@ public class App {
         }
 
     }
+    
+    public static void executeStaticCase(List<Integer> values, int shuffleSeed) {
+        TwoFourTree tft = new TwoFourTree();
+
+        List<Integer> testValues = new ArrayList<>(values); // Copy list to avoid modifying original
+
+        if (ShouldShuffle)
+            Collections.shuffle(testValues, new Random(shuffleSeed));
+
+        for (int i : testValues) {
+        	System.out.printf("Adding %d to the tree\n", i);
+            tft.addValue(i);
+        }
+
+        for (int i : testValues) {
+            if (!tft.hasValue(i)) {
+                System.out.printf("Seed %d: Failed to add/find %d in static test\n", shuffleSeed, i);
+            }
+        }
+
+        if (PrintStaticTree) {
+            System.out.printf("***** Static test (seed %d):\n", shuffleSeed);
+            tft.printInOrder();
+        }
+
+        if (RunDeleteCases) {
+            List<Integer> deletes = generateStrikeList(testValues, testValues.size() / 5);
+
+            for (int i : deletes) {
+                tft.deleteValue(i);
+                if (tft.hasValue(i)) {
+                    System.out.printf("Seed %d: Failed to delete %d in static test\n", shuffleSeed, i);
+                }
+            }
+            if (PrintStaticTree) {
+                System.out.printf("***** After deleting nodes (seed %d): ", shuffleSeed);
+                System.out.println(deletes.toString());
+                tft.printInOrder();
+            }
+        }
+    }
+
 
     public static void main(String[] args) throws Exception {
-        if (ShouldBeRandom)
-            RandomGenerator = new Random();
-        List<Integer> primeList = Arrays.asList(
-        		new Integer[] { 97, 89, 83, 79, 73, 71, 67, 61, 59, 53, 47, 43,
-                        41, 37, 31, 29, 23, 19, 17, 13, 11, 7, 5, 3, 2 });
+//        if (ShouldBeRandom)
+//            RandomGenerator = new Random();
+//        
+//        System.out.println(RandomGenerator);
+//        
+//        List<Integer> primeList = Arrays.asList(
+//        		new Integer[] { 97, 89, 83, 79, 73, 71, 67, 61, 59, 53, 47, 43,
+//                        41, 37, 31, 29, 23, 19, 17, 13, 11, 7, 5, 3, 2 });
+//
+//        executeStaticCase(primeList);
 
-        executeStaticCase(primeList);
-
-//       executeIntCase(100, 20, RunDeleteCases);
+//        executeIntCase(100, 20, RunDeleteCases);
 //        executeIntCase(1000, 200, RunDeleteCases);
 //        executeIntCase(10000, 2000, RunDeleteCases);
 //        executeIntCase(100000, 20000, RunDeleteCases);
@@ -310,5 +356,40 @@ public class App {
 //            executeIntCase(1000000, 200000, RunDeleteCases && RunLargeDeleteCases);
 //            executeIntCase(10000000, 2000000, RunDeleteCases && RunLargeDeleteCases);
 //        }
+// ========================================================================================
+//    	int failingSeed = -1;
+//
+//        for (int seed = 0; seed < 100; seed++) {
+//            RandomGenerator = new Random(seed);
+//            System.out.printf("Testing seed: %d\n", seed);
+//
+//            List<Integer> primeList = Arrays.asList(
+//                    new Integer[] { 97, 89, 83, 79, 73, 71, 67, 61, 59, 53, 47, 43,
+//                            41, 37, 31, 29, 23, 19, 17, 13, 11, 7, 5, 3, 2 });
+//
+//            try {
+//                executeStaticCase(primeList);
+//            } catch (Exception e) {
+//                System.out.printf("Exception on seed %d: %s\n", seed, e.getMessage());
+//                failingSeed = seed;
+//                break; // Or continue to test more seeds
+//            }
+//        }
+//    }
+// =========================================================================================   	
+    	ShouldShuffle = true; // Make sure shuffling is enabled
+        PrintStaticTree = true; // Avoid huge output unless needed
+        RunDeleteCases = true; // Optional
+
+        List<Integer> primeList = Arrays.asList(
+                new Integer[] { 97, 89, 83, 79, 73, 71, 67, 61, 59, 53, 47, 43,
+                        41, 37, 31, 29, 23, 19, 17, 13, 11, 7, 5, 3, 2 });
+
+        for (int seed = 2; seed < 3; seed++) {
+            System.out.printf("Trying shuffle seed: %d\n", seed);
+            executeStaticCase(primeList, seed);
+//            executeIntCase(100, 20, RunDeleteCases);
+//            executeIntCase(1000, 200, RunDeleteCases);
+        }
     }
 }
