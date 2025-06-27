@@ -262,152 +262,15 @@ public class TwoFourTree {
 			}
 		}
 
-		public void add(int value) {
-
-			if (this.isTwoNode()) {
-				// If value is less than nodes value 1. Switch old v1s place to v2 and give to
-				// v1.
-				if (value < this.value1) {
-					this.value2 = this.value1;
-					this.value1 = value;
-					++this.values;
-				}
-				// Place value in the second spot otherwise.
-				else {
-					this.value2 = value;
-					++this.values;
-				}	
-			}
-			else if (this.isThreeNode()) {
-				if (value < this.value1) {
-					
-				}
-			}
-
-		}
+		
 
 	}
 
 	TwoFourTreeItem root = null; // Root of the tree. If null, the tree is empty.
 
-	// Adding a value to the tree
-	public boolean addValue2(int value) {
+	
 
-		// If the tree is empty. Instantiate it with a new value
-		if (root == null) {
-			root = new TwoFourTreeItem(value);
-			return true;
-		}
-
-		TwoFourTreeItem walker = root;
-
-		// =========Special Case 1:Walker starts at the first and (Only) node ever
-		// created for the tree.======================================
-		if (walker.isRoot() && walker.isLeaf) {
-			// Scenario for a TwoNode
-			if (walker.isTwoNode()) {
-				// If value is less than nodes value 1. Switch old v1s place to v2 and give to
-				// v1.
-				if (value < walker.value1) {
-					walker.value2 = walker.value1;
-					walker.value1 = value;
-					++walker.values;
-				}
-				// Place value in the second spot otherwise.
-				else {
-					walker.value2 = value;
-					++walker.values;
-				}
-			} else if (walker.isThreeNode()) {
-
-				if (value < walker.value1) {
-					walker.value3 = walker.value2;
-					walker.value2 = walker.value1;
-					walker.value1 = value;
-					++walker.values;
-				}
-
-				else if (value < walker.value2) {
-					walker.value3 = walker.value2;
-					walker.value2 = value;
-					++walker.values;
-				} else {
-					walker.value3 = value;
-					++walker.values;
-				}
-			}
-			/*
-			 * Split the values from each other into each of their own node(?) v2 is a
-			 * parent of v1 and v3
-			 */
-			else if (walker.isFourNode()) {
-				// There has to be a better way for doing this.
-				TwoFourTreeItem RootParent = new TwoFourTreeItem(walker.value2);
-				TwoFourTreeItem Left = new TwoFourTreeItem(walker.value1);
-				TwoFourTreeItem Right = new TwoFourTreeItem(walker.value3);
-
-				// Attach the new parent to its child
-				RootParent.leftChild = Left;
-				RootParent.rightChild = Right;
-				// Vice versa
-				Left.parent = RootParent;
-				Right.parent = RootParent;
-
-				// Root is no longer a leaf
-				root = RootParent;
-				walker = root;
-				walker.isLeaf = false;
-
-			}
-		}
-
-		while (!walker.isLeaf) {
-
-			if (walker.isTwoNode()) {
-				walker = NonLoopTraversal(walker, value);
-			} else if (walker.isThreeNode()) {
-
-			} else if (walker.isFourNode()) {
-				walker = breakApart(walker);
-				NonLoopTraversal(walker, value);
-			}
-		}
-
-		if (walker.isLeaf) {
-			if (walker.isTwoNode()) {
-				walker.add(value);
-			} else if (walker.isThreeNode()) {
-
-			} else if (walker.isFourNode()) {
-				walker = breakApart(walker);
-				NonLoopTraversal(walker, value);
-			}
-		}
-		return false;
-	}
-
-	public TwoFourTreeItem breakApart(TwoFourTreeItem walker) {
-
-		int ParentType = walker.ParentType();
-		// There has to be a better way for doing this.
-		TwoFourTreeItem RootParent = new TwoFourTreeItem(walker.value2);
-		TwoFourTreeItem Left = new TwoFourTreeItem(walker.value1);
-		TwoFourTreeItem Right = new TwoFourTreeItem(walker.value3);
-
-		// Attach the new parent to its child
-		RootParent.leftChild = Left;
-		RootParent.rightChild = Right;
-		// Vice versa
-		Left.parent = RootParent;
-		Right.parent = RootParent;
-
-		// Root is no longer a leaf
-		root = RootParent;
-		walker = root;
-		walker.isLeaf = false;
-
-		return walker;
-	}
+	
 
 	public boolean addValue(int value) {
 
@@ -654,7 +517,8 @@ public class TwoFourTree {
 					}
 					// If value 2 of walker is bigger than parents value 1 but smaller than 3.
 					// Promotion came from the middle.
-					else if (walker.value2 > walker.parent.value1 && walker.value2 < walker.parent.value3) {
+					// BUGGED no longer
+					else if (walker.value2 > walker.parent.value1 && walker.value2 < walker.parent.value2) {
 						walker.parent.value3 = walker.parent.value2;
 						walker.parent.value2 = walker.value2;
 						walker.parent.values++;
@@ -1014,15 +878,16 @@ public class TwoFourTree {
 
 	// Searching for a value in the tree
 	public boolean hasValue(int value) {
-
+		int i = 0;
 		TwoFourTreeItem walker = root;
 
 		// Root case
 		if (NodeSearcher(walker, value)) {
 			return true;
 		}
-
+		
 		while (!walker.isLeaf) {
+			i++;
 			// Two Node Scenario
 			if (walker.isTwoNode()) {
 				if (value < walker.value1) {
@@ -1155,11 +1020,12 @@ public class TwoFourTree {
 	public boolean deleteValue(int value) {
 
 		TwoFourTreeItem walker = root;
-		TwoFourTreeItem next = null; // Will tell us what the next node is to pre-emptevely merge or rotate
+		TwoFourTreeItem next = walker; // Will tell us what the next node is to pre-emptevely merge or rotate
 
-		while (walker != null && !NodeSearcher(walker, value)) {
+		while (walker != null && !NodeSearcher(walker, value) && !walker.isLeaf) {
 			next = NonLoopTraversal(walker, value);
-
+			
+			
 			if (next.isTwoNode()) {
 				int childPosition = next.ChildPosition();
 				int ParentType = next.ParentType();
@@ -1170,7 +1036,7 @@ public class TwoFourTree {
 			if (walker.parent.values == 0) {
 				root = walker;
 			}
-
+			
 		}
 
 		if (NodeSearcher(walker, value)) {
@@ -1184,63 +1050,132 @@ public class TwoFourTree {
 
 	private void deleteInternal(TwoFourTree.TwoFourTreeItem node, int value) {
 
-		TwoFourTreeItem hold = node;
-		TwoFourTreeItem walker = hold;
-		TwoFourTreeItem next = walker;
-		int indexOriginalPosition = hold.IndexLocation(value);
+		TwoFourTreeItem hold = node;   // Holds the node where the value is. Would need to be updated 
+		TwoFourTreeItem walker = hold; // Walks through the tree
+		TwoFourTreeItem next = walker; // Scouts the tree for scenarios
+
 
 		int indexPosition = hold.IndexLocation(value);
-
+		int d = 0;
 		while (!walker.isLeaf) {
+			d++;
 			indexPosition = walker.IndexLocation(value);
+			
+			// Four node Scenarios
 			if (indexPosition == 0 && walker.isFourNode()) {
 				if (!walker.leftChild.isTwoNode()) {
 					walker = FindMaxNode(walker.leftChild);
+					int MaxValue = walker.findMaxValue();
+					
+					hold.setValueAt(indexPosition, MaxValue);
+					walker.removeRightmostValue();
 				} else if (!walker.centerLeftChild.isTwoNode()) {
-					walker = FindMinNode(walker.rightChild);
+					walker = FindMinNode(walker.centerLeftChild);
+					int MinValue = walker.value1;
+					
+					hold.setValueAt(indexPosition, MinValue);
+					walker.removeValueAt(walker.IndexLocation(MinValue));
 				} else {
 					TwoFourTreeItem Merge = Merge(walker.leftChild, walker, walker.centerLeftChild);
+					if(Merge.parent.values == 0) {
+						Merge.parent = null;
+					}
 					walker = Merge;
-
+					hold = walker;
+					
 				}
 			} else if (indexPosition == 1 && walker.isFourNode()) {
 				if (!walker.centerLeftChild.isTwoNode()) {
 					walker = FindMaxNode(walker.centerLeftChild);
+					int MaxValue = walker.findMaxValue();
+					
+					hold.setValueAt(indexPosition, MaxValue); // Set it at the new old
+					walker.removeRightmostValue(); //Remove it from the old node
 				} else if (!walker.centerRightChild.isTwoNode()) {
 					walker = FindMinNode(walker.centerRightChild);
+					//Insert steps here
+					int MinValue = walker.value1;
+					hold.setValueAt(indexPosition, MinValue);
+					walker.removeLeftmostValue();
+					
+					
 				} else {
 					TwoFourTreeItem Merge = Merge(walker.centerLeftChild, walker, walker.centerRightChild);
+					if(Merge.parent.values == 0) {
+						Merge.parent = null;
+					}
 					walker = Merge;
+					hold = walker;
 				}
 
 			} else if (indexPosition == 2 && walker.isFourNode()) {
 				if (!walker.centerRightChild.isTwoNode()) {
 					walker = FindMaxNode(walker.centerRightChild);
+					int MaxValue = walker.findMaxValue();
+					
+					hold.setValueAt(indexPosition, MaxValue); // Set it at the new old
+					walker.removeRightmostValue(); //Remove it from the old node
+					
+					
 				} else if (!walker.rightChild.isTwoNode()) {
 					walker = FindMinNode(walker.rightChild);
+					//Insert steps here
+					int MinValue = walker.value1;
+					hold.setValueAt(indexPosition, MinValue);
+					walker.removeLeftmostValue();
 				} else {
 					TwoFourTreeItem Merge = Merge(walker.centerRightChild, walker, walker.rightChild);
+					if(Merge.parent.values == 0) {
+						Merge.parent = null;
+					}
 					walker = Merge;
+					hold = walker;
 				}
+			// Three Node Scenarios
 			} else if (indexPosition == 0 && walker.isThreeNode()) {
 				if (!walker.leftChild.isTwoNode()) {
-					walker = FindMaxNode(walker.leftChild);
+					walker = FindMaxNode(walker.leftChild); //Find the node with the max value on this while performing NodeMerge
+					int MaxValue = walker.findMaxValue(); // Grab the max value
+					
+					hold.setValueAt(indexPosition, MaxValue); // Set it at the new old
+					walker.removeValueAt(walker.IndexLocation(MaxValue)); //Remove it from the old node
 				} else if (!walker.centerChild.isTwoNode()) {
 					walker = FindMinNode(walker.centerChild);
+					int MinValue = walker.value1;
+					hold.setValueAt(indexPosition, MinValue);
+					walker.removeValueAt(walker.IndexLocation(MinValue));
 				} else {
 					TwoFourTreeItem Merge = Merge(walker.leftChild, walker, walker.centerChild);
+					if(Merge.parent.values == 0) {
+						Merge.parent = null;
+					}
 					walker = Merge;
+					hold = walker;
 				}
 
 			} else if (indexPosition == 1 && walker.isThreeNode()) {
 				if (!walker.centerChild.isTwoNode()) {
 					walker = FindMaxNode(walker.centerChild);
+					int MaxValue = walker.findMaxValue();
+					
+					hold.setValueAt(indexPosition, MaxValue);
+					walker.removeRightmostValue();
+					
 				} else if (!walker.rightChild.isTwoNode()) {
 					walker = FindMinNode(walker.rightChild);
+					int MinValue = walker.value1;
+					
+					hold.setValueAt(indexPosition, MinValue);
+					walker.removeLeftmostValue();
 				} else {
 					TwoFourTreeItem Merge = Merge(walker.centerChild, walker, walker.rightChild);
+					if(Merge.parent.values == 0) {
+						Merge.parent = null;
+					}
 					walker = Merge;
+					hold = walker;
 				}
+			// Two Node Scenarios
 			} else {
 				if (!walker.leftChild.isTwoNode()) {
 					walker = FindMaxNode(walker.leftChild);
@@ -1252,10 +1187,16 @@ public class TwoFourTree {
 					int MinValue = walker.valueAt(0);
 					hold.setValueAt(indexPosition, MinValue);
 				} else {
-
+					TwoFourTreeItem Merge = Merge(walker.leftChild, walker, walker.rightChild);
+					if(Merge.parent.values == 0) {
+						Merge.parent = null;
+					}
+					root = Merge;
+					walker = Merge;
+					hold = walker;
 				}
 			}
-
+			d++;
 		}
 		if (walker.isLeaf) {
 			if (NodeSearcher(walker, value)) {
@@ -1511,6 +1452,7 @@ public class TwoFourTree {
 					center.leftChild = Merge;
 				}
 			}
+			
 
 			return Merge;
 		} else if (position == 2) {
@@ -1657,17 +1599,21 @@ public class TwoFourTree {
 
 	private void RotateLeft(TwoFourTreeItem node, TwoFourTreeItem sibling) {
 		// Grab the next higher value from parent
-		node.value2 = node.nextHigher();
+		int nextHigher = node.nextHigher();
+		node.value2 = nextHigher;
 		// Grab the index of parents value location
-		int parentValueLocation = node.parent.IndexLocation(node.nextHigher());
+		int parentValueLocation = node.parent.IndexLocation(nextHigher);
 		// Perform the last steps of Left rotation
 		node.parent.setValueAt(parentValueLocation, sibling.value1);
 		sibling.removeLeftmostValue();
-
+		node.values++;
 		// Re-attach children to new statuses
 		if (!node.isLeaf) {
+			if (node.isThreeNode()) {
+				node.centerChild = node.rightChild;
+			}
+
 			node.rightChild = sibling.leftChild;
-			node.values++;
 
 			sibling.leftChild.parent = node;
 
@@ -1689,7 +1635,7 @@ public class TwoFourTree {
 		// Grab the next higher value from parent
 		node.value2 = node.value1;
 		int oldValue = node.nextLower();
-		node.value1 = node.nextLower();
+		node.value1 = oldValue;
 		node.values++;
 
 		// Grab the index of parents value location
@@ -1790,21 +1736,14 @@ public class TwoFourTree {
 		return null;
 	}
 
-	private TwoFourTreeItem findMax(TwoFourTreeItem node) {
-		while (!node.isLeaf) {
-			if (node.isFourNode() && node.rightChild != null) {
-				node = node.rightChild;
-			} else if (node.isThreeNode()) {
-				node = node.rightChild;
-			} else {
-				node = node.rightChild;
-			}
-		}
-		return node;
-	}
+
 
 	public TwoFourTree.TwoFourTreeItem NonLoopTraversal(TwoFourTreeItem walker, int value) {
 		// Send a one time traverse for the delete function to move on.
+		if (walker.isLeaf) {
+			return walker;
+		}
+		
 		// Two Node Scenario
 		if (walker.isTwoNode()) {
 			if (value < walker.value1) {
@@ -1832,6 +1771,7 @@ public class TwoFourTree {
 			} else
 				walker = walker.rightChild;
 		}
+	
 		return walker;
 	}
 
@@ -1916,16 +1856,7 @@ public class TwoFourTree {
 		}
 	}
 
-	private void borrowFromRightSibling(TwoFourTreeItem underflowNode, TwoFourTreeItem parent, TwoFourTreeItem sibling,
-			int parentIndex) {
-		if (sibling.values >= 2) {
-			underflowNode.value1 = parent.valueAt(parentIndex);
-			underflowNode.values++;
 
-			parent.setValueAt(parentIndex, sibling.removeLeftmostValue());
-			sibling.values--;
-		}
-	}
 
 	public TwoFourTree() {
 	}
