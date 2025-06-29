@@ -197,7 +197,7 @@ public class TwoFourTree {
 					temp = this.parent.value1;
 				} else if (this.value1 > this.parent.value2 && this.value1 < this.parent.value3) {
 					temp = this.parent.value2;
-				} else if (this.value1 < this.parent.value3) {
+				} else if (this.value1 > this.parent.value3) {
 					temp = this.parent.value3;
 				}
 			} else if (this.parent.isTwoNode()) {
@@ -1044,6 +1044,7 @@ public class TwoFourTree {
 		if (NodeSearcher(walker, value)) {
 			deleteInternal(walker, value);
 			//printInOrder();
+			//System.out.printf("\n");
 			return true;
 		}
 
@@ -1184,11 +1185,13 @@ public class TwoFourTree {
 					walker = FindMaxNode(walker.leftChild);
 					int MaxValue = walker.findMaxValue();
 					hold.setValueAt(indexPosition, MaxValue);
+					walker.removeRightmostValue();
 
 				} else if (!walker.rightChild.isTwoNode()) {
 					walker = FindMinNode(walker.rightChild);
 					int MinValue = walker.valueAt(0);
 					hold.setValueAt(indexPosition, MinValue);
+					walker.removeLeftmostValue();
 				} else {
 					TwoFourTreeItem Merge = Merge(walker.leftChild, walker, walker.rightChild);
 					if(Merge.parent.values == 0) {
@@ -1405,7 +1408,7 @@ public class TwoFourTree {
 			TwoFourTreeItem Merge = new TwoFourTreeItem(left.value1, centerPiece, right.value1);
 
 			// Grab the index of the center value from parent
-			int valueIndex = center.IndexLocation(left.nextHigher());
+			int valueIndex = center.IndexLocation(centerPiece);
 			center.removeValueAt(valueIndex);
 
 			// Re-attach children's statuses
