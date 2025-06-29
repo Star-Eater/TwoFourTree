@@ -23,7 +23,7 @@ public class App {
      * With both ShouldShuffle and ShouldBeRandom false, the test cases are
      * deterministic on a given machine, which may aid you in finding specific bugs.
      */
-    static boolean ShouldBeRandom = true;
+    static boolean ShouldBeRandom = false;
 
     /*
      * Whether to test deletion. You can turn off this option if you know delete
@@ -43,7 +43,7 @@ public class App {
      * Whether to complain when a find returns false. Leaving this on when running
      * delete cases is very noisy.
      */
-    static boolean NoisyFinds = false;
+    static boolean NoisyFinds = true;
 
     /*
      * Whether to print the tree after the static tests. Useful in early debugging,
@@ -56,8 +56,12 @@ public class App {
      * is *VERY* noisy, but running it for the small dynamic cases may help you find
      * deletion problems.
      */
+<<<<<<< HEAD
     static boolean PrintDeleteTrees = false
     		;
+=======
+    static boolean PrintDeleteTrees = true;
+>>>>>>> d17f95f6c0c14aff599062854d3e27b36c6bbc7f
 
     /*
      * END OF CONFIGURATION OPTIONS
@@ -80,7 +84,7 @@ public class App {
         ArrayList<Integer> list = new ArrayList<Integer>(howMany);
 
         for (int i = 0; i < howMany; i++) {
-            list.add(Integer.valueOf(RandomGenerator.nextInt(1000000000)));
+            list.add(Integer.valueOf(RandomGenerator.nextInt(10000)));
         }
         list = deDuplicateAndScramble(list);
 
@@ -315,9 +319,18 @@ public class App {
     	    RandomGenerator = new Random();
     	    
     	}
+<<<<<<< HEAD
 
     	List<Integer> primeList = Arrays.asList(
     		new Integer[] { 
+=======
+    	for (int i = 0; i < 2; i++) {
+    		RandomGenerator = new Random(i);
+    		System.out.printf("%d iteration\n", i);
+
+    		List<Integer> primeList = Arrays.asList(
+    				new Integer[] { 
+>>>>>>> d17f95f6c0c14aff599062854d3e27b36c6bbc7f
     					    2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 
     					    53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 
     					    127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 
@@ -330,6 +343,7 @@ public class App {
     					    809, 811, 821, 823, 827, 829, 839, 853, 857, 859, 863, 877, 881, 883, 887, 
     					    907, 911, 919, 929, 937, 941, 947, 953, 967, 971, 977, 983, 991, 997
     					});
+<<<<<<< HEAD
 
 
     	executeStaticCase(primeList);
@@ -341,6 +355,20 @@ public class App {
     	    executeIntCase(10000000, 2000000, RunDeleteCases && RunLargeDeleteCases);
     	    executeIntCase(100000000, 20000000, RunDeleteCases && RunLargeDeleteCases);
     	}
+=======
+
+
+    	//executeStaticCase(primeList);
+    	}
+    	executeIntCase(100, 20, RunDeleteCases);
+//    	executeIntCase(1000, 200, RunDeleteCases);
+//    	executeIntCase(10000, 2000, RunDeleteCases);
+//    	executeIntCase(100000, 20000, RunDeleteCases);
+//    	if (RunLargeCases) {
+//    	    executeIntCase(1000000, 200000, RunDeleteCases && RunLargeDeleteCases);
+//    	    executeIntCase(10000000, 2000000, RunDeleteCases && RunLargeDeleteCases);
+//    	}
+>>>>>>> d17f95f6c0c14aff599062854d3e27b36c6bbc7f
 
 
 
