@@ -14,7 +14,7 @@ public class App {
      * Shuffle the created lists. If your code works without this but not with it,
      * something is wrong while "moving left" in a case.
      */
-    static boolean ShouldShuffle = false;
+    static boolean ShouldShuffle = true;
 
     /*
      * Actually randomize the test case. We will use this in testing. When this is
@@ -37,7 +37,7 @@ public class App {
      * credit.
      */
     static boolean RunLargeCases = true;
-    static boolean RunLargeDeleteCases = false;
+    static boolean RunLargeDeleteCases = true;
 
     /*
      * Whether to complain when a find returns false. Leaving this on when running
@@ -56,7 +56,8 @@ public class App {
      * is *VERY* noisy, but running it for the small dynamic cases may help you find
      * deletion problems.
      */
-    static boolean PrintDeleteTrees = false;
+    static boolean PrintDeleteTrees = false
+    		;
 
     /*
      * END OF CONFIGURATION OPTIONS
@@ -69,7 +70,7 @@ public class App {
         TreeSet<Integer> deDuped = new TreeSet<Integer>(list);
         ArrayList<Integer> outList = new ArrayList<Integer>(deDuped);
         if (ShouldShuffle) {
-            Collections.shuffle(outList);
+            Collections.shuffle(outList, RandomGenerator);
         }
 
         return outList;
@@ -259,10 +260,10 @@ public class App {
         TwoFourTree tft = new TwoFourTree();
 
         if (ShouldShuffle)
-            Collections.shuffle(values);
+            Collections.shuffle(values, RandomGenerator);
 
         for (int i : values) {
-//        	System.out.printf("%d is added\n", i);
+        	//System.out.printf("%d is added\n", i);
             tft.addValue(i);
             if (!tft.hasValue(i)) {
                 System.out.printf("Failed to add %d in static test\n", i);
@@ -304,124 +305,44 @@ public class App {
 
     }
     
-    public static void executeStaticCase(List<Integer> values, int shuffleSeed) {
-        TwoFourTree tft = new TwoFourTree();
 
-        List<Integer> testValues = new ArrayList<>(values); // Copy list to avoid modifying original
-
-        if (ShouldShuffle)
-            Collections.shuffle(testValues, new Random(shuffleSeed));
-
-        for (int i : testValues) {
-        	System.out.printf("Adding %d to the tree\n", i);
-            tft.addValue(i);
-        }
-
-        for (int i : testValues) {
-            if (!tft.hasValue(i)) {
-                System.out.printf("Seed %d: Failed to add/find %d in static test\n", shuffleSeed, i);
-            }
-        }
-
-        if (PrintStaticTree) {
-            System.out.printf("***** Static test (seed %d):\n", shuffleSeed);
-            tft.printInOrder();
-        }
-
-        if (RunDeleteCases) {
-            List<Integer> deletes = generateStrikeList(testValues, testValues.size() / 5);
-            int k = 0;
-            for (int i : deletes) {
-            	System.out.printf("%d iteration", k);
-            	System.out.printf("Deleteing %d from Tree\n", i);
-                tft.deleteValue(i);
-                if (tft.hasValue(i)) {
-                    System.out.printf("Seed %d: Failed to delete %d in static test\n", shuffleSeed, i);
-                    System.exit(1);
-                }
-            }
-            if (PrintStaticTree) {
-                tft.printInOrder();
-                System.out.printf("***** After deleting nodes (seed %d): ", shuffleSeed);
-                System.out.println(deletes.toString());
-            }
-        }
-    }
 
     // Only gets used if !ShouldBeRandom.
-    static Random RandomGenerator = new Random();
+    static Random RandomGenerator = new Random(1);
     
     public static void main(String[] args) throws Exception {
     	if (ShouldBeRandom) {
     	    RandomGenerator = new Random();
     	    
     	}
-    	for (int i = 0; i < 400000; i++) {
-    		RandomGenerator = new Random(i);
-    		System.out.printf("%d iteration\n", i);
 
-    		List<Integer> primeList = Arrays.asList(
-    	        new Integer[] { 
-    	        		593, 61, 857, 743, 263, 281, 197, 3, 467, 13, 277, 89, 563, 479, 29, 271, 173, 971, 659, 541, 193, 241, 449, 727, 601, 853, 83, 863, 919, 257, 877, 373, 751, 317, 811, 5, 103, 929, 829, 733, 487, 311, 163, 709, 37, 149, 787, 677, 67, 653, 349, 997, 823, 433, 347, 461, 571, 401, 367, 307, 109, 809, 167, 199, 223, 101, 239, 73, 23, 701, 739, 331, 181, 229, 607, 947, 491, 97, 59, 439, 859, 773, 313, 821, 127, 43, 577, 389, 283, 41, 547, 2, 983, 383, 631, 503, 661, 359, 937, 379, 683, 107, 587, 617, 419, 757, 521, 233, 673, 47, 761, 179, 211, 227, 137, 421, 17, 251, 113, 443, 11, 31, 647, 883, 827, 599, 557, 19, 293, 71, 337, 911, 139, 941, 79, 409, 191, 431, 131, 157, 967, 269, 7, 509, 691, 151, 523, 499, 457, 797, 613, 887, 643, 977, 769, 353, 463, 719, 907, 839, 53, 991, 881, 397, 569, 953, 641
-    	        	    });
+    	List<Integer> primeList = Arrays.asList(
+    		new Integer[] { 
+    					    2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 
+    					    53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 
+    					    127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 
+    					    211, 223, 227, 229, 233, 239, 241, 251, 257, 263, 269, 271, 277, 281, 283, 293, 
+    					    307, 311, 313, 317, 331, 337, 347, 349, 353, 359, 367, 373, 379, 383, 389, 397, 
+    					    401, 409, 419, 421, 431, 433, 439, 443, 449, 457, 461, 463, 467, 479, 487, 491, 499, 
+    					    503, 509, 521, 523, 541, 547, 557, 563, 569, 571, 577, 587, 593, 599, 
+    					    601, 607, 613, 617, 619, 631, 641, 643, 647, 653, 659, 661, 673, 677, 683, 691, 
+    					    701, 709, 719, 727, 733, 739, 743, 751, 757, 761, 769, 773, 787, 797, 
+    					    809, 811, 821, 823, 827, 829, 839, 853, 857, 859, 863, 877, 881, 883, 887, 
+    					    907, 911, 919, 929, 937, 941, 947, 953, 967, 971, 977, 983, 991, 997
+    					});
+
 
     	executeStaticCase(primeList);
+    	executeIntCase(100, 20, RunDeleteCases);
+    	executeIntCase(1000, 200, RunDeleteCases);
+    	executeIntCase(10000, 2000, RunDeleteCases);
+    	executeIntCase(100000, 20000, RunDeleteCases);
+    	if (RunLargeCases) {
+    	    executeIntCase(10000000, 2000000, RunDeleteCases && RunLargeDeleteCases);
+    	    executeIntCase(100000000, 20000000, RunDeleteCases && RunLargeDeleteCases);
     	}
-//    	executeIntCase(100, 20, RunDeleteCases);
-//    	executeIntCase(1000, 200, RunDeleteCases);
-//    	executeIntCase(10000, 2000, RunDeleteCases);
-//    	executeIntCase(100000, 20000, RunDeleteCases);
-//    	if (RunLargeCases) {
-//    	    executeIntCase(1000000, 200000, RunDeleteCases && RunLargeDeleteCases);
-//    	    executeIntCase(10000000, 2000000, RunDeleteCases && RunLargeDeleteCases);
-//    	}
 
-// ========================================================================
-//        Scanner scanner = new Scanner(System.in);
-//        System.out.print("Enter seed (or press Enter for random): ");
-//        String input = scanner.nextLine();
-//
-//        int seed;
-//        if (input.isEmpty()) {
-//            seed = (int) System.currentTimeMillis();  // or use `new Random().nextInt()`
-//            ShouldBeRandom = true;
-//            System.out.println("Using random seed: " + seed);
-//        } else {
-//            seed = Integer.parseInt(input);
-//            ShouldBeRandom = false;
-//            System.out.println("Using user-provided seed: " + seed);
-//        }
-//===================================================================================================
-//    	int seed = 11;
-//    	RandomGenerator = new Random(seed);
-//
-//    	// Example test list – replace with whatever values you want to test
-//    	List<Integer> testList = Arrays.asList(
-//    	    2, 3, 5, 7, 11, 13, 17, 19, 23, 29,
-//    	    31, 37, 41, 43, 47, 53, 59, 61, 67, 71,
-//    	    73, 79, 83, 89, 97, 101, 103, 107, 109, 113,
-//    	    127, 131, 137, 139, 149, 151, 157, 163, 167, 173,
-//    	    179, 181, 191, 193, 197, 199, 211, 223, 227, 229,
-//    	    233, 239, 241, 251, 257, 263, 269, 271, 277, 281,
-//    	    283, 293, 307, 311, 313, 317, 331, 337, 347, 349,
-//    	    353, 359, 367, 373, 379, 383, 389, 397, 401, 409,
-//    	    419, 421, 431, 433, 439, 443, 449, 457, 461, 463,
-//    	    467, 479, 487, 491, 499, 503, 509, 521, 523, 541,
-//    	    547, 557, 563, 569, 571, 577, 587, 593, 599, 601,
-//    	    607, 613, 617, 631, 641, 643, 647, 653, 659, 661,
-//    	    673, 677, 683, 691, 701, 709, 719, 727, 733, 739,
-//    	    743, 751, 757, 761, 769, 773, 787, 797, 809, 811,
-//    	    821, 823, 827, 829, 839, 853, 857, 859, 863, 877,
-//    	    881, 883, 887, 907, 911, 919, 929, 937, 941, 947,
-//    	    953, 967, 971, 977, 983, 991, 997
-//    	);
-//
-//    	executeStaticCase(testList, seed);
-//
-//
-//        // You can also run dynamic tests here
-//        //executeIntCase(100, 20, RunDeleteCases);
-//        //executeIntCase(1000, 200, RunDeleteCases);
+
 
 
     }
